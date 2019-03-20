@@ -192,7 +192,7 @@ def plot(data):
     plt.pcolormesh(x, y, z)
     plt.plot((0, x.max()), (y.max()/2, y.max()/2), "r-")
     plt.colorbar()
-    plt.xlim(xmax=m-1)
+    plt.xlim(right=m-1)
     x_ticks = np.arange(x.min(), x.max(), 6)
     x_labels = range(x_ticks.size)
     plt.xticks(x_ticks, x_labels)
@@ -201,7 +201,7 @@ def plot(data):
     y_labels = ['3.16', '6.31', '12.6', '25.1', '50.1', '100']
     plt.yticks(y_ticks, y_labels)
     plt.ylabel('Diameter [nm]')
-    plt.ylim(ymax=n-1)
+    plt.ylim(top=n-1)
     plt.show()
 
     
