@@ -1,3 +1,4 @@
 pandas==0.23.4
 rdflib==4.2.2
 matplotlib==3.0.2
+pyRdfa3==3.5.1
