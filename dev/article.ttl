@@ -1,0 +1,115 @@
+@prefix acl: <http://www.w3.org/ns/auth/acl#> .
+@prefix as: <https://www.w3.org/ns/activitystreams#> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix cc: <https://creativecommons.org/ns#> .
+@prefix cert: <http://www.w3.org/ns/auth/cert#> .
+@prefix cito: <http://purl.org/spar/cito/> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dctypes: <http://purl.org/dc/dcmitype/> .
+@prefix deo: <http://purl.org/spar/deo/> .
+@prefix dio: <https://w3id.org/dio#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix doco: <http://purl.org/spar/doco/> .
+@prefix fabio: <http://purl.org/spar/fabio/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ldp: <http://www.w3.org/ns/ldp#> .
+@prefix mem: <http://mementoweb.org/ns#> .
+@prefix oa: <http://www.w3.org/ns/oa#> .
+@prefix opmw: <http://www.opmw.org/ontology/> .
+@prefix orkg: <http://orkg.org/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix pimspace: <http://www.w3.org/ns/pim/space#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix qb: <http://purl.org/linked-data/cube#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rel: <https://www.w3.org/ns/iana/link-relations/relation#> .
+@prefix rsa: <http://www.w3.org/ns/auth/rsa#> .
+@prefix schema: <http://schema.org/> .
+@prefix sio: <http://semanticscience.org/resource/> .
+@prefix sioc: <http://rdfs.org/sioc/ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix solid: <http://www.w3.org/ns/solid/terms#> .
+@prefix vivo: <http://vivoweb.org/ontology/core#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix wgs: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://dokie.li/new> a sioc:Post,
+        schema:CreativeWork,
+        prov:Entity .
+
+[] a bibo:Article,
+        schema:Article ;
+    orkg:hasResearchContribution [ a orkg:ResearchContribution ;
+            orkg:addresses [ a orkg:ResearchProblem ;
+                    orkg:label "Temporal characteristics of nucleation events"@en ] ;
+            orkg:yields orkg:R578 ] ;
+    orkg:hasResearchField orkg:R145 ;
+    dc:creator [ a foaf:Person ;
+            vivo:orcidId <https://orcid.org/0000-0002-1657-2383> ;
+            foaf:family_name "Laaksonen"@en ;
+            foaf:givenname "A."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Fuzzi"@en ;
+            foaf:givenname "S."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Mikkonen"@en ;
+            foaf:givenname "S."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Dal Maso"@en ;
+            foaf:givenname "M."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Hamed"@en ;
+            foaf:givenname "A."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId <https://orcid.org/0000-0003-3464-7825> ;
+            foaf:family_name "Kulmala"@en ;
+            foaf:givenname "M."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Joutsensaari"@en ;
+            foaf:givenname "J."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Decesari"@en ;
+            foaf:givenname "S."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Cavalli"@en ;
+            foaf:givenname "F."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Sogacheva"@en ;
+            foaf:givenname "L."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Lehtinen"@en ;
+            foaf:givenname "K. E. J."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Facchini"@en ;
+            foaf:givenname "M. C."@en ],
+        [ a foaf:Person ;
+            vivo:orcidId ""@en ;
+            foaf:family_name "Mircea"@en ;
+            foaf:givenname "M."@en ] ;
+    dc:date "2007"@en ;
+    dc:isPartOf [ a bibo:Journal ;
+            dc:title "Atmos. Chem. Phys."@en ] ;
+    dc:title "Nucleation and growth of new particles in Po Valley, Italy"@en ;
+    bibo:doi <https://doi.org/10.5194/acp-7-355-2007> ;
+    bibo:issue "2"@en ;
+    bibo:pageEnd "376"@en ;
+    bibo:pageStart "355"@en ;
+    bibo:volume "7"@en ;
+    schema:dateModified "2019-11-01T16:20:37.886000+00:00"^^xsd:dateTime ;
+    owl:sameAs <https://reddine.solid.community/public/hamed07nucleation.html> .
