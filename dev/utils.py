@@ -111,12 +111,16 @@ def getAuthors(g):
         PREFIX bibo: <http://purl.org/ontology/bibo/>
         PREFIX dc: <http://purl.org/dc/terms/>
         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-        SELECT ?firstname ?lastname WHERE {
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        SELECT ?firstname ?lastname
+        WHERE {
           ?a a bibo:Article .                              
           ?a dc:creator ?c .
           ?c foaf:givenname ?firstname .
           ?c foaf:family_name ?lastname .
+          ?c schema:position ?position .
         }
+        ORDER BY xsd:integer(?position)
     """).iterrows()]
 
 def getLabelOfNode(g,nodeID):
