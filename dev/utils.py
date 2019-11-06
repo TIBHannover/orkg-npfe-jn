@@ -191,63 +191,72 @@ def save_paper(g):
 
 
 def store(g):
+    resources = {}
+    predicates = {}
     for s, p, o in g:    
         if(p.n3() in [RDF.type.n3()]) and o in cube_classes:
             continue 
-        s_id = get_id(api_resources, s, g)
-        p_id = get_id(api_predicates, p, g)
+            
+        resources, s_id = get_id(resources, api_resources, s, g)
+        resources, p_id = get_id(resources, api_predicates, p, g)
         
         if type(o) is Literal:
             cls = 'literal'
-            o_id = get_id(api_literals, o, g)
+            resources, o_id = get_id(resources, api_literals, o, g)
         else:
             cls = 'resource'
-            o_id = get_id(api_resources, o, g)
+            resources, o_id = get_id(resources, api_resources, o, g)
         
         requests.post(api_statements,
                       json={'subject_id': s_id, 'predicate_id': p_id, 'object': {'id': o_id, '_class': cls}}, 
                       headers={'Content-Type':'application/json'})
+    dataset_node = str([s for s, p, o in g.triples((None, RDF.type, cube['DataSet']))][0])
+    return resources[dataset_node]
 
 
-def get_id(api, r, g):
-    l = None
-    l_classes = []
-    if type(r) is Literal:
-        l = r   
-    else:
-        l = g.value(r, RDFS.label)
-        Ts = [o for s, p , o in g.triples( (r, RDF.type, None))]
-        # Set the classes of a ressource
-        for T in Ts:
-            if(T in cube_classes):
-                lc = 'qb:'+T.split('#')[-1]
-                l_class = requests.get(api_classes, params={'q':lc, 'exact': 'true'}, headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()
-                if len(l_class) == 0:
-                    l_classes.append(requests.post(api_classes, json={'label':lc}, headers={'Content-Type':'application/json'}).json()['id'])
-                if len(l_class) == 1:
-                    l_classes.append(l_class[0]['id'])
-        
-        # Name a predicate with the ressource ID
+def get_id(resources, api, r, g):
+    if not str(r) in resources or api==api_predicates:
+        l = None
+        l_classes = []
+        if type(r) is Literal:
+            l = r   
+        else:
+            l = g.value(r, RDFS.label)
+            Ts = [o for s, p , o in g.triples( (r, RDF.type, None))]
+            # Set the classes of a ressource
+            for T in Ts:
+                if(T in cube_classes):
+                    lc = 'qb:'+T.split('#')[-1]
+                    l_class = requests.get(api_classes, params={'q':lc, 'exact': 'true'}, headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()
+                    if len(l_class) == 0:
+                        l_classes.append(requests.post(api_classes, json={'label':lc}, headers={'Content-Type':'application/json'}).json()['id'])
+                    if len(l_class) == 1:
+                        l_classes.append(l_class[0]['id'])
+
+            # Name a predicate with the ressource ID
+            if (api==api_predicates):
+                if len(Ts) > 0:
+                    if not str(r) in resources:
+                        l = requests.post(api_resources, json={'label':l, 'classes':l_classes}, headers={'Content-Type':'application/json'}).json()['id']
+                        resources[str(r)] = l
+                    else:
+                        l = resources[str(r)]
+
+        if l is None:
+            raise Exception('Label is none for resource {}'.format(r))
         if (api==api_predicates):
-            if len(Ts) > 0:
-                j = requests.get(api_resources, params={'q':l, 'exact': 'true'}, headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()
-                if len(j) == 0:
-                    l = requests.post(api_resources, json={'label':l, 'classes':l_classes}, headers={'Content-Type':'application/json'}).json()['id']
-                if len(j) == 1:
-                    l = j[0]['id']
-        
-    if l is None:
-        raise Exception('Label is none for resource {}'.format(r))
-        
-    j = requests.get(api, params={'q':l, 'exact': 'true'}, headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()
-    
-    if len(j) == 0:
-        return requests.post(api, json={'label':l, 'classes':l_classes}, headers={'Content-Type':'application/json'}).json()['id']
-        
-    if len(j) == 1:
-        return j[0]['id']
-        
-    raise Exception('Lookup for {}, expected only one result {}'.format(l, j))
+            j = requests.get(api, params={'q':l, 'exact': 'true'}, headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()
+            if len(j) == 0:
+                return resources, requests.post(api, json={'label':l, 'classes':l_classes}, headers={'Content-Type':'application/json'}).json()['id']
+            if len(j) == 1:
+                return resources, j[0]['id']
+        else:
+            resource_id = requests.post(api, json={'label':l, 'classes':l_classes}, headers={'Content-Type':'application/json'}).json()['id']
+            resources[str(r)] = resource_id
+            return resources, resource_id
+    else:
+        return resources, resources[str(r)]
+
 
 
 def save_dataset(dataset, title):
@@ -370,8 +379,5 @@ def save_dataset(dataset, title):
         gds.add((bno, dt4, Literal(str(row['Duration']))))
         gds.add((bno, dt5, Literal(str(row['Sunrise']))))
         gds.add((bno, dt6, Literal(str(row['Sunset']))))
-    store(gds)
-    dataset_class_id = requests.get(api_classes, params={'q':'qb:DataSet', 'exact': 'true'}, headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()[0]['id']                                                               
-    dataset_resource = requests.get('{0}{1}/resources/'.format(api_classes, dataset_class_id), headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()
-    dataset_resource_id = [d.get('id') for d in dataset_resource if d.get('label').lower()==title.lower()][0]
+    dataset_resource_id = store(gds)
     return dataset_resource_id
