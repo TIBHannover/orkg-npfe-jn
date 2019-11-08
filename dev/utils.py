@@ -129,6 +129,7 @@ def getLabelOfNode(g,nodeID):
 
 yieldsPredicate = 'P1'
 researchProblemPredicate = 'P32'
+qbDatasetClass = 'QBDataset'
 def getResearchProblems(g, contributionID):
     researchProblems = [ResearchProblem for s, p , ResearchProblem in g.triples((BNode(contributionID), URIRef('http://orkg.org/core#addresses'), None))]
     researchProblemsArray=[]
@@ -231,11 +232,18 @@ def get_id(resources, api, r, g):
             for T in Ts:
                 if(T in cube_classes):
                     lc = 'qb:'+T.split('#')[-1]
-                    l_class = requests.get(api_classes, params={'q':lc, 'exact': 'true'}, headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()
-                    if len(l_class) == 0:
-                        l_classes.append(requests.post(api_classes, json={'label':lc}, headers={'Content-Type':'application/json'}).json()['id'])
-                    if len(l_class) == 1:
-                        l_classes.append(l_class[0]['id'])
+                    if lc != 'qb:DataSet': # Beceause we use a fixed ID for qb:DataSet class
+                        l_class = requests.get(api_classes, params={'q':lc, 'exact': 'true'}, headers={'Content-Type':'application/json', 'Accept':'application/json'}).json()
+                        if len(l_class) == 0:
+                            l_classes.append(requests.post(api_classes, json={'label':lc}, headers={'Content-Type':'application/json'}).json()['id'])
+                        if len(l_class) == 1:
+                            l_classes.append(l_class[0]['id'])
+                    else:
+                        res = requests.get(api_classes+qbDatasetClass+'/', headers={'Content-Type':'application/json', 'Accept':'application/json'})
+                        if res.status_code == 404:
+                            l_classes.append(requests.post(api_classes, json={'label':lc, 'id':qbDatasetClass}, headers={'Content-Type':'application/json'}).json()['id'])
+                        else:
+                            l_classes.append(res.json()['id'])
 
             # Name a predicate with the ressource ID
             if (api==api_predicates):
