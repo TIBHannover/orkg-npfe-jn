@@ -271,7 +271,7 @@ def get_id(resources, api, r, g):
 
 
 
-def save_dataset(dataset, title):
+def save_dataset(dataset, title, dimensions):
     gds = Graph()
     # Vocabulary properties labels
     gds.add((RDF.type, RDFS.label, Literal('type')))
@@ -292,18 +292,7 @@ def save_dataset(dataset, title):
     # BNodes
     ds = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # theDataset
     dsd = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # theDataStructureDefinition
-    cs1 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentSpecification Month
-    cs2 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentSpecification Event start time
-    cs3 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentSpecification Event end time
-    cs4 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentSpecification Duration
-    cs5 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentSpecification Sunrise
-    cs6 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentSpecification Sunset
-    dt1 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentProperty Month
-    dt2 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentProperty Event start time
-    dt3 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentProperty Event end time
-    dt4 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentProperty Duration
-    dt5 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentProperty Sunrise
-    dt6 = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid())) # ComponentProperty Sunset
+
     '''
     Dataset
     '''
@@ -315,81 +304,33 @@ def save_dataset(dataset, title):
     '''
     gds.add((dsd, RDF.type, cube['DataStructureDefinition']))
     gds.add((dsd, RDFS.label, Literal('Data Structure Definition ESUC')))
-    gds.add((dsd, cube['component'], cs1))  
-    gds.add((dsd, cube['component'], cs2)) 
-    gds.add((dsd, cube['component'], cs3))
-    gds.add((dsd, cube['component'], cs4))
-    gds.add((dsd, cube['component'], cs5))
-    gds.add((dsd, cube['component'], cs6))
-    '''
-    Dimensions
-    '''
-    gds.add((cs1, RDF.type, cube['ComponentSpecification']))
-    gds.add((cs1, RDFS.label, Literal('Component Specification Month')))
-    gds.add((cs1, cube['order'], Literal(1)))
-    gds.add((cs1, cube['dimension'], dt1))
+        
+    cs = dict()
+    dt = dict()
+    for index, column in enumerate(dataset.columns, start=1):
+        cs[column] = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid()))
+        dt[column] = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid()))
+        gds.add((dsd, cube['component'], cs[column]))
+        
+        gds.add((cs[column], RDF.type, cube['ComponentSpecification']))
+        gds.add((cs[column], RDFS.label, Literal('Component Specification '+column)))
+        gds.add((cs[column], cube['order'], Literal(index)))
 
-    gds.add((dt1, RDF.type, cube['DimensionProperty']))
-    gds.add((dt1, RDF.type, cube['ComponentProperty']))
-    gds.add((dt1, RDFS.label, Literal('Month')))
-    '''
-    Measures
-    '''
-    gds.add((cs2, RDF.type, cube['ComponentSpecification']))
-    gds.add((cs2, RDFS.label, Literal('Component Specification Event start time')))
-    gds.add((cs2, cube['order'], Literal(2)))
-    gds.add((cs2, cube['measure'], dt2))
-
-    gds.add((dt2, RDF.type, cube['MeasureProperty']))
-    gds.add((dt2, RDF.type, cube['ComponentProperty']))
-    gds.add((dt2, RDFS.label, Literal('Event start time')))
-    ###
-    gds.add((cs3, RDF.type, cube['ComponentSpecification']))
-    gds.add((cs3, RDFS.label, Literal('Component Specification Event end time')))
-    gds.add((cs3, cube['order'], Literal(3)))
-    gds.add((cs3, cube['measure'], dt3))
-
-    gds.add((dt3, RDF.type, cube['MeasureProperty']))
-    gds.add((dt3, RDF.type, cube['ComponentProperty']))
-    gds.add((dt3, RDFS.label, Literal('Event end time')))
-    ###
-    gds.add((cs4, RDF.type, cube['ComponentSpecification']))
-    gds.add((cs4, RDFS.label, Literal('Component Specification Duration')))
-    gds.add((cs4, cube['order'], Literal(4)))
-    gds.add((cs4, cube['measure'], dt4))
-
-    gds.add((dt4, RDF.type, cube['MeasureProperty']))
-    gds.add((dt4, RDF.type, cube['ComponentProperty']))
-    gds.add((dt4, RDFS.label, Literal('Duration')))
-    ###
-    gds.add((cs5, RDF.type, cube['ComponentSpecification']))
-    gds.add((cs5, RDFS.label, Literal('Component Specification Sunrise')))
-    gds.add((cs5, cube['order'], Literal(5)))
-    gds.add((cs5, cube['measure'], dt5))
-
-    gds.add((dt5, RDF.type, cube['MeasureProperty']))
-    gds.add((dt5, RDF.type, cube['ComponentProperty']))
-    gds.add((dt5, RDFS.label, Literal('Sunrise')))
-    ###
-    gds.add((cs6, RDF.type, cube['ComponentSpecification']))
-    gds.add((cs6, RDFS.label, Literal('Component Specification Sunset')))
-    gds.add((cs6, cube['order'], Literal(6)))
-    gds.add((cs6, cube['measure'], dt6))
-
-    gds.add((dt6, RDF.type, cube['MeasureProperty']))
-    gds.add((dt6, RDF.type, cube['ComponentProperty']))
-    gds.add((dt6, RDFS.label, Literal('Sunset')))
-
+        if column in dimensions:
+            gds.add((cs[column], cube['dimension'], dt[column]))
+            gds.add((dt[column], RDF.type, cube['DimensionProperty']))
+        else:
+            gds.add((cs[column], cube['measure'], dt[column]))
+            gds.add((dt[column], RDF.type, cube['MeasureProperty']))
+        gds.add((dt[column], RDF.type, cube['ComponentProperty']))
+        gds.add((dt[column], RDFS.label, Literal(column)))
+        
     for index, row in dataset.iterrows():
         bno = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid()))
         gds.add((bno, RDF.type, cube['Observation']))
         gds.add((bno, RDFS.label, Literal('SMEAR Observation #{}'.format(index+1))))
         gds.add((bno, cube['dataSet'], ds))
-        gds.add((bno, dt1, Literal(str(row['Month']))))
-        gds.add((bno, dt2, Literal(str(row['Event start time']))))
-        gds.add((bno, dt3, Literal(str(row['Event end time']))))
-        gds.add((bno, dt4, Literal(str(row['Duration']))))
-        gds.add((bno, dt5, Literal(str(row['Sunrise']))))
-        gds.add((bno, dt6, Literal(str(row['Sunset']))))
+        for column in dataset.columns:
+            gds.add((bno, dt[column], Literal(str(row[column]))))
     dataset_resource_id = store(gds)
     return dataset_resource_id
