@@ -199,7 +199,7 @@ def store(g):
     resources = {}
     predicates = {}
     for s, p, o in g:    
-        if(p.n3() in [RDF.type.n3()]) and o in cube_classes:
+        if ((p.n3() in [RDF.type.n3()]) and o in cube_classes) or p.n3() in [RDFS.label.n3()]:
             continue 
             
         resources, s_id = get_id(resources, api_resources, s, g)
