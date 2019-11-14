@@ -142,7 +142,7 @@ def getResearchProblems(g, contributionID):
             else:
                 researchProblemsArray.append({"@id": researchProblemID.split('#')[-1]})
         else:
-            researchProblemsArray.append({"text": researchProblemLabel.value})
+            researchProblemsArray.append({"label": researchProblemLabel.value})
     return researchProblemsArray
 
 def getResearchResults(g, contributionID):
@@ -157,7 +157,7 @@ def getResearchResults(g, contributionID):
             else:
                 researchResultsArray.append({"@id": researchResultID.split('#')[-1]})
         else:
-            researchResultsArray.append({"text": researchResultLabel.value})
+            researchResultsArray.append({"label": researchResultLabel.value})
     return researchResultsArray
 
 
@@ -170,7 +170,7 @@ def save_paper(g):
           ?a orkg:hasResearchContribution ?ResearchContribution .
         }
     """).iterrows()]
-
+    
     paper = {
         "predicates": [],
         "paper": {
