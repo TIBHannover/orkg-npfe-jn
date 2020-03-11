@@ -18,7 +18,8 @@ from shortid import ShortId
 from orkg import ORKG
 from dateutil import parser
 sid = ShortId()
-orkg = ORKG()
+host = "http://localhost:8000"
+orkg = ORKG(host=host)
 
 '''
 To avoid that rdflib Graph create a new namespace (happened when the generated ID starts with a number or -)
@@ -37,7 +38,7 @@ def query(g, q, dtype={}):
     return pd.read_csv(StringIO(output.getvalue().decode()), dtype=dtype)
 
 # ORKG API endpoints
-api = 'http://localhost:8000/api/'
+api = host+'/api/'
 api_resources = '{}resources/'.format(api)
 api_predicates = '{}predicates/'.format(api)
 api_literals = '{}literals/'.format(api)
@@ -213,7 +214,7 @@ def store(g):
             resources, o_id = get_id(resources, api_resources, o, g)
         
         requests.post(api_statements,
-                      json={'subject_id': s_id, 'predicate_id': p_id, 'object': {'id': o_id, '_class': cls}}, 
+                      json={'subject_id': s_id, 'predicate_id': p_id, 'object_id': o_id}, 
                       headers={'Content-Type':'application/json'})
     dataset_node = str([s for s, p, o in g.triples((None, RDF.type, cube['DataSet']))][0])
     return resources[dataset_node]
@@ -328,7 +329,7 @@ def save_dataset(dataset, title, dimensions):
     for index, row in dataset.iterrows():
         bno = URIRef('http://orkg.org/vocab/esuc/{}'.format(generate_sid()))
         gds.add((bno, RDF.type, cube['Observation']))
-        gds.add((bno, RDFS.label, Literal('SMEAR Observation #{}'.format(index+1))))
+        gds.add((bno, RDFS.label, Literal('Observation #{}'.format(index+1))))
         gds.add((bno, cube['dataSet'], ds))
         for column in dataset.columns:
             gds.add((bno, dt[column], Literal(str(row[column]))))
